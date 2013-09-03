@@ -1,8 +1,8 @@
 <{strip}>
 <{* パッチワーク一覧用テンプレート *}>
 <div class="outerdiv">
+<{$action.xxx}>
 	<form action="#">
-
 <{*
 		<div class="top_description">
 			<{$lang.patchworks}>
@@ -24,102 +24,8 @@
 					</th>
 				</tr>
 
-				<tr id="patchworks_current_rowd1<{$id}>" >
-					<td class="patchworks_grid_col">
-		                <label for="patchworks_current1<{$id}>">
-			                <input id="patchworks_current1<{$id}>" type="radio" name="current" 
-					                value="1" onclick="patchworksCls['<{$id}>'].changeCurrent('1');" 
-					                <{if $action.patchworks_id == 1}>checked<{/if}>/>
-		                </label>
-					</td>
-					<td class="patchworks_grid_col">1</td>
-					<td class="patchworks_grid_col">
-						<{$lang.patchworks_name_1}>
-					</td>
-				</tr>
+            <{include file="patchworks_view_edit_list_one.html"}>
 
-				<tr id="patchworks_current_rowd2<{$id}>" >
-					<td class="patchworks_grid_col">
-		                <label for="patchworks_current2<{$id}>">
-			                <input id="patchworks_current2<{$id}>" type="radio" name="current" 
-					                value="2" onclick="patchworksCls['<{$id}>'].changeCurrent('2');" 
-					                <{if $action.patchworks_id == 2}>checked<{/if}>/>
-		                </label>
-					</td>
-					<td class="patchworks_grid_col">2</td>
-					<td class="patchworks_grid_col">
-						<{$lang.patchworks_name_2}>
-					</td>
-				</tr>
-
-				<tr id="patchworks_current_rowd3<{$id}>" >
-					<td class="patchworks_grid_col">
-		                <label for="patchworks_current3<{$id}>">
-			                <input id="patchworks_current3<{$id}>" type="radio" name="current" 
-					                value="3" onclick="patchworksCls['<{$id}>'].changeCurrent('3');"
-					                <{if $action.patchworks_id == 3}>checked<{/if}>/>
-		                </label>
-					</td>
-					<td class="patchworks_grid_col">3</td>
-					<td class="patchworks_grid_col">
-						<{$lang.patchworks_name_3}>
-					</td>
-				</tr>
-
-<tr id="patchworks_current_rowd4<{$id}>" >
-<td class="patchworks_grid_col">
-<label for="patchworks_current4<{$id}>">
-<input id="patchworks_current4<{$id}>" type="radio" name="current" 
- value="4" onclick="patchworksCls['<{$id}>'].changeCurrent('4');" 
-<{if $action.patchworks_id == 4}>checked<{/if}>/>
-</label>
-</td>
-<td class="patchworks_grid_col">4</td>
-<td class="patchworks_grid_col">
-<{$lang.patchworks_name_4}>
-</td>
-</tr>
-<tr id="patchworks_current_rowd5<{$id}>" >
-<td class="patchworks_grid_col">
-<label for="patchworks_current5<{$id}>">
-<input id="patchworks_current5<{$id}>" type="radio" name="current" 
- value="5" onclick="patchworksCls['<{$id}>'].changeCurrent('5');" 
-<{if $action.patchworks_id == 5}>checked<{/if}>/>
-</label>
-</td>
-<td class="patchworks_grid_col">5</td>
-<td class="patchworks_grid_col">
-<{$lang.patchworks_name_5}>
-</td>
-</tr>
-
-<tr id="patchworks_current_rowd6<{$id}>" >
-<td class="patchworks_grid_col">
-<label for="patchworks_current6<{$id}>">
-<input id="patchworks_current6<{$id}>" type="radio" name="current" 
- value="6" onclick="patchworksCls['<{$id}>'].changeCurrent('6');" 
-<{if $action.patchworks_id == 6}>checked<{/if}>/>
-</label>
-</td>
-<td class="patchworks_grid_col">6</td>
-<td class="patchworks_grid_col">
-<{$lang.patchworks_name_6}>
-</td>
-</tr>
-
-<tr id="patchworks_current_rowd7<{$id}>" >
-<td class="patchworks_grid_col">
-<label for="patchworks_current7<{$id}>">
-<input id="patchworks_current7<{$id}>" type="radio" name="current" 
- value="7" onclick="patchworksCls['<{$id}>'].changeCurrent('7');" 
-<{if $action.patchworks_id == 7}>checked<{/if}>/>
-</label>
-</td>
-<td class="patchworks_grid_col">7</td>
-<td class="patchworks_grid_col">
-<{$lang.patchworks_name_7}>
-</td>
-</tr>
 
 			</table>
 		</fieldset>

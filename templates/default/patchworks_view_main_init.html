@@ -1,11 +1,5 @@
-<{*テンプレート内容をここに記述*}>
-<{include file="../patchworks_script.html"}>
-<{if $smarty.session._auth_id >=_AUTH_CHIEF}>
-<div class="widthmax"  title="<{$smarty.const._DBLCLICK_EDIT}>" 
-ondblclick="patchworksCls['<{$id}>'].patchworksEditShow();" onmouseover="if(typeof(commonCls) != 'undefined') {commonCls.blockNotice(event, this);}">
+<{if $action.view_main_init_template}>
+<{include file=$action.view_main_init_template}>
 <{else}>
-<div class="widthmax">
+<{include file="patchworks_view_main_init_default.html"}>
 <{/if}>
-	<{$action.patchworks_id}>
-	<div class="float-clear-div">&nbsp;</div>
-</div>

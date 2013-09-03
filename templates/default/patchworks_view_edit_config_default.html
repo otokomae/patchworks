@@ -1,0 +1,72 @@
+<{strip}>
+<{* パッチワークス設定画面 *}>
+<form id="patchworks_form<{$id}>" action="#" onsubmit="commonCls.sendPost('<{$id}>', Form.serialize($('patchworks_form<{$id}>')), {'target_el':$('<{$id}>'),'focus_flag':true});return false;">
+<input type="hidden" name="action" />
+<input type="hidden" name="patchworks_id" />
+
+
+<h1>ID <{$action.patchworks_id}>  <{if $action.patchworks_data_flag !=1}>  <{$lang.patchworks_data_flag}> <{/if}></h1>
+    <table class="outer" summary="<{$smarty.const._SUMMARY_SETTINGFORM}>">
+
+        <tr class="row">
+            <th class="nowrap" scope="row">
+                <label for="patchworks_name<{$id}>">
+                    <{$lang.patchworks_name}>
+                    <{$action.patchworks_name}>
+                </label>
+            </th>
+            <td>
+<input  class="text" type="text" name="patchworks_name" /> 
+            </td>
+        </tr>
+
+
+<tr class="row">
+<th class="nowrap" scope="row">
+<label for="patchworks_description<{$id}>">
+<{$lang.patchworks_description}>
+</label>
+</th>
+<td>
+<textarea name="patchworks_description"/>
+ <{$action.config.patchworks_description}>
+</textarea>
+</td>
+</tr>
+
+<{* マルチデータベースが設定されている場合 *}>
+<{if $action.multis }>
+<tr class="row">
+<th class="nowrap" scope="row">
+<{$lang.patchworks_multi_name}>
+</th>
+<td>
+<select  name="multidatabase_id" >
+<option value="" ></option>
+<{foreach from=$action.multis item=multis name="multis"}>
+<option value="<{$multis.multidatabase_id}>"
+<{if $action.config.multidatabase_id == $multis.multidatabase_id}> selected=selected<{/if}> >
+<{$multis.multidatabase_name}> (<{$multis.multidatabase_id}>) </option>
+<{/foreach}>
+</select> <br />
+
+<{$lang.patchworks_multi_description}>
+</td>
+</tr>
+<{/if}>
+
+</table>
+    <div class="btn-bottom">
+        <input class="btn-width" type="submit" value="<{$lang._regist|smarty:nodefaults}>" />
+        <input class="lined_btn btn-width" type="button" value="<{$lang._cancel|smarty:nodefaults}>" onclick="commonCls.sendView('<{$id}>', 'patchworks_view_edit_config');" />
+    </div>
+</form>
+<{include file="../patchworks_script.html"}>
+<script class="nc_script" type="text/javascript">
+    var patchworksForm = $("patchworks_form<{$id}>");
+    patchworksForm["action"].value = "patchworks_action_edit_config";
+    patchworksForm["patchworks_id"].value = "<{$action.patchworks_id}>";
+    patchworksForm["patchworks_name"].value = "<{$action.config.patchworks_name}>";
+
+</script>
+<{/strip}>
