@@ -1,0 +1,17 @@
+<{* パッチワーク一覧用テンプレート ひとつ表示用*}>
+<{foreach from=$action.patchworks_list item=patchwork name="patchwork"}>
+<tr id="patchworks_current_rowd<{$patchwork.id}><{$id}>" >
+<td class="patchworks_grid_col">
+<label for="patchworks_current<{$patchwork.id}><{$id}>">
+<input id="patchworks_current<{$pachwork.id}><{$id}>" type="radio" name="current" 
+value="<{$patchwork.id}>" onclick="patchworksCls['<{$id}>'].changeCurrent('<{$patchwork.id}>');" 
+ <{if $action.patchworks_id == $patchwork.id }>checked<{/if}>/>
+</label>
+</td>
+<td class="patchworks_grid_col"><{$patchwork.id}></td>
+<td class="patchworks_grid_col">
+<{$patchwork.name}>
+</td>
+</tr>
+<{/foreach}>
+

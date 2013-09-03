@@ -1,51 +1,5 @@
-<{strip}>
-<{* パッチワークス設定画面 *}>
-<form id="patchworks_form<{$id}>" action="#" onsubmit="commonCls.sendPost('<{$id}>', Form.serialize($('patchworks_form<{$id}>')), {'target_el':$('<{$id}>'),'focus_flag':true});return false;">
-<input type="hidden" name="action" />
-<input type="hidden" name="patchworks_id" />
-
-
-<h1>ID <{$action.patchworks_id}>  <{if $action.patchworks_data_flag !=1}>  <{$lang.patchworks_data_flag}> <{/if}></h1>
-    <table class="outer" summary="<{$smarty.const._SUMMARY_SETTINGFORM}>">
-
-        <tr class="row">
-            <th class="nowrap" scope="row">
-                <label for="patchworks_name<{$id}>">
-                    <{$lang.patchworks_name}>
-                    <{$action.patchworks_name}>
-                </label>
-            </th>
-            <td>
-<input id="patchworks_name" class="text" type="text" name="patchworks_name" /> 
-            </td>
-        </tr>
-<tr class="row">
-<th class="nowrap" scope="row">
-<label for="patchworks_config_code<{$id}>">
-<{$lang.patchworks_config_code}>
-</label>
-</th>
-<td>
-<textarea id="patchworks_config_code"
- name="patchworks_config_code" />
-<{$action.config.patchworks_config_code}>
-</textarea>
-</td>
-</tr>
-
-
-</table>
-    <div class="btn-bottom">
-        <input class="btn-width" type="submit" value="<{$lang._regist|smarty:nodefaults}>" />
-        <input class="lined_btn btn-width" type="button" value="<{$lang._cancel|smarty:nodefaults}>" onclick="commonCls.sendView('<{$id}>', 'patchworks_view_edit_config');" />
-    </div>
-</form>
-<{include file="../patchworks_script.html"}>
-<script class="nc_script" type="text/javascript">
-    var patchworksForm = $("patchworks_form<{$id}>");
-    patchworksForm["action"].value = "patchworks_action_edit_config";
-    patchworksForm["patchworks_id"].value = "<{$action.patchworks_id}>";
-    patchworksForm["patchworks_name"].value = "<{$action.config.patchworks_name}>";
-
-</script>
-<{/strip}>
+<{if $action.view_edit_config_template}>
+<{include file=$action.view_edit_config_template}>
+<{else}>
+<{include file="patchworks_view_edit_config_default.html"}>
+<{/if}>

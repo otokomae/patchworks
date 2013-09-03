@@ -1,17 +1,5 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * patchworks 
- *
- * @package     NetCommons
- * @author      Noriko Arai,Ryuji Masukawa
- * @copyright   2006-2007 NetCommons Project
- * @license     http://www.netcommons.org/license.txt  NetCommons License
- * @project     NetCommons Project, supported by National Institute of Informatics
- * @access      public
- */
 class Patchworks_View_Edit_Config extends Action
 {
     // パラメータを受け取るため
@@ -32,14 +20,41 @@ class Patchworks_View_Edit_Config extends Action
      */
     function execute()
     {
-  $this->patchworks_id=$this->patchworksView->getPatchworksID($this->block_id);
-  $this->config=$this->patchworksView->getConfig($this->patchworks_id);
+     // ブロックIDから割り当てられているパッチーワークIDを取得する
+     // ブロックIDに patchworksIDが割り当てられていないならエラーにする
+     // patchworksID は、長いので、 id にする 
+     $id = 
+     intval($this->patchworksView->getPatchworksID($this->block_id));
+     if ( $id == 0 ){return "error";};
 
-  if ( isset($this->config->patchworks_id)  ){$this->patchworks_data_flag=1;}
+     //パッチワークスの設定情報を取得する。設定されていない場合もあるのに注意 
+     $this->config=$this->patchworksView->getConfig($id);
+     
+ 
+      
+     $this->multis=$this->patchworksView->getMultis();
 
-            if ($this->patchworks_id === false) {
-                return "error";
-            }
+     $this->patchworks_id = $id;
+     // テンプレートが読み込む、スクリプトファイル
+     $x=BASE_DIR .
+     "/webapp/modules/patchworks/templates/patchworks_script.html";
+     $this->patchworks_script = $x;
+
+ 
+     $x=BASE_DIR ."/extra/addin/patchworksID/".$this->patchworks_id . 
+     "/patchworks_view_edit_config_".$this->patchworks_id. ".html";
+     if (! is_file($x)) {
+         $x=""; 
+     }
+     $this->view_edit_config_template=$x;
+
+     if ( isset($this->config['patchworks_id']) )
+     {$this->patchworks_data_flag=1;}
+     $x = BASE_DIR .'/extra/addin/patchworksID/' . 
+     $this->patchworks_id.'/view_edit_config.php';
+     if ( is_file( $x ) ) {
+       include($x);
+     } // end of execution
 
         return "config";
     }

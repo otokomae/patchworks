@@ -1,17 +1,5 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
-* [[機能説明]]
- *
- * @package     NetCommons
- * @author      Noriko Arai,Ryuji Masukawa
- * @copyright   2006-2007 NetCommons Project
- * @license     http://www.netcommons.org/license.txt  NetCommons License
- * @project     NetCommons Project, supported by National Institute of Informatics
- * @access      public
- */
 class Patchworks_View_Main_Init extends Action
 {
     /**
@@ -23,39 +11,48 @@ class Patchworks_View_Main_Init extends Action
     var $block_id = null;
    // 使用コンポーネントを受け取るため
     var $patchworksView = null;
+    var $db = null;
     var $session = null;
     var $request = null;
 
     function execute()
     {
-        $this->patchworks_id=$this->patchworksView->getPatchworksID($this->block_id);
 
-
-
+    $this->patchworks_id = 
+    intval($this->patchworksView->getPatchworksID($this->block_id));
+     
+     if (  $this->patchworks_id == 0 ) {
+     return "error";
+     } 
+        // patchworks_id を簡便のために id とする
+        $id = $this->patchworks_id;
+         
+        $this->config = $this->patchworksView->getConfig($id);
+        $this->item = $this->patchworksView->getItem($this->block_id);
+        $this->role_auth_id = $this->session->getParameter('_role_auth_id');
         $this->user_id = $this->session->getParameter('_user_id');
-        $this->handle = $this->session->getParameter('_handle');
-        $this->config = $this->patchworksView->getConfig($this->patchworks_id);
-        $this->item=$this->patchworksView->getItem($this->block_id);
-        $this->groups=$this->patchworksView->getGroups();
-        $this->rooms=$this->patchworksView->getRoomsByUser($this->user_id);
-        $x=$this->patchworksView->getGlobalConfigByName("first_choice_startpage");
-        $this->first_choice_startpage = $x;
-        
-        $this->multidatabase_id =0; 
 
-        if (isset( $this->item->multidatabase_id) ){
-        $this->multidatabase_id =$this->item->multidatabase_id;
-        } 
+        // テンプレートが読み込む、スクリプトファイル 
+        $x=BASE_DIR ."/webapp/modules/patchworks/templates/patchworks_script.html";
+        $this->patchworks_script = $x;
 
-        if (  intval($this->patchworks_id) < 1 ){
-          return 'success';
-        }
 // ここでコードを読み込む
-       include(BASE_DIR .'/webapp/modules/patchworks/patchs/'.intval($this->patchworks_id).'.php');
+       $x=BASE_DIR .'/extra/addin/patchworksID/'.$id.'/view_main_init.php';
+       if (is_file($x)) {include($x);};
+// パッチーク別のテンプレートを読み込む       
+       $x=BASE_DIR ."/extra/addin/patchworksID/".$id."/patchworks_view_main_init_".$id. ".html";
+       if (is_file($x)) {
+       $this->view_main_init_template=$x;
+       };
+// パッチーク別のエラーテンプレートを読み込む       
+       $x=BASE_DIR ."/extra/addin/patchworksID/".$id."/patchworks_view_error_".$id. ".html";
+       if (is_file($x)) {
+       $this->view_error_template=$x;
+       };
 
          //return  'success' . $this->patchworks_id; 
-          $this->template='patchworks_view_main_init_'.$this->patchworks_id. '.html';
-          return 'success';
+
+       return 'success';
     }
 }
 ?>

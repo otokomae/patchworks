@@ -25,6 +25,7 @@ class Patchworks_Components_View
 	 *
 	 * @access	private
 	 */
+	var $_container = null;
 	var $_request = null;
 
 	/**
@@ -37,6 +38,7 @@ class Patchworks_Components_View
 		$container =& DIContainerFactory::getContainer();
 		$this->_db =& $container->getComponent("DbObject");
 		$this->_request =& $container->getComponent("Request");
+		$this->_session =& $container->getComponent("Session");
 	}
 
 
@@ -60,8 +62,9 @@ class Patchworks_Components_View
 			$this->_db->addError();
 			return $x;
 		}
-		if(isset($x[0]["item"])) {
-		      return json_decode($x[0]["item"]);} else
+// array として返す
+		if( isset($x[0]["item"]) ) {  
+		    return json_decode($x[0]["item"] , true);} else
         {return 0;}
 
 
@@ -84,13 +87,15 @@ class Patchworks_Components_View
 				"FROM {patchworks_config} ".
 				"WHERE patchworks_id = ?";
 		$x = $this->_db->execute($sql,$params);
+
 		if ($x === false) {
 			$this->_db->addError();
-			return $x;
+			return array();
 		}
-		if(isset($x[0]["config"])) {
-		      return json_decode($x[0]["config"]);} else
-        {return 0;}
+
+		if(isset($x[0]["config"]) ) { 
+		   return json_decode($x[0]["config"] , true);} else
+        {return array();}
 
     }
 
@@ -127,7 +132,16 @@ class Patchworks_Components_View
 		$sql = "SELECT multidatabase_id,multidatabase_name ".
 				"FROM {multidatabase} ";
 		$x = $this->_db->execute($sql);
-        return $x;
+        
+        $xarray  = array();
+        if ( ! $x  ) {return  array();};
+        foreach ($x as $k=>$v){
+          $xarray[$v['multidatabase_id']]['multidatabase_name'] = 
+          $v['multidatabase_name'];
+          $xarray[$v['multidatabase_id']]['multidatabase_id'] = 
+          $v['multidatabase_id'];
+        }
+        return $xarray;
     }
 
 	/**
@@ -137,7 +151,26 @@ class Patchworks_Components_View
 	 * @access	public
 	 */
 
-	function getMultiMeta($multidatabase_id) {
+	function getMultiMetaData($multidatabase_id) {
+    // Meta data のデータを取得　キーは、メタデータID
+		$params = array(intval($multidatabase_id));
+		$sql = "SELECT  * ".
+				"FROM {multidatabase_metadata} ".
+				"WHERE multidatabase_id = ?";
+		$x = $this->_db->execute($sql, $params);
+        // error のときは、空の配列を返す
+		if ($x === false) {
+			$this->_db->addError();
+			return array();
+		}
+        $xxx=array();
+        foreach ($x as $k=>$v) {
+         $xxx[$v['metadata_id']]=$v; 
+        }
+        return $xxx; 
+
+    }
+	function getMultiMetaName($multidatabase_id) {
     // Meta data の一覧を取得し、名前をキーにして戻す
 		$params = array(intval($multidatabase_id));
 		$sql = "SELECT  metadata_id,name ".
@@ -155,11 +188,50 @@ class Patchworks_Components_View
         return $xxx; 
     }
 	
+    function getMultiTitle($multidatabase_id) {
+    // 指定された汎用DBのタイトルをもってくる
+		$params = array($multidatabase_id);
+        // title を取得
+		$sql = "SELECT title_metadata_id ".
+				"FROM {multidatabase} ".
+				"WHERE multidatabase_id = ? ";
+		$x = $this->_db->execute($sql, $params);
+        if ( ! $x  ) {return  array();};
+
+        if ( isset($x[0]['title_metadata_id']) ) {
+		   $params = array($x[0]['title_metadata_id']);
+		   $sql = "SELECT   content_id,content ".
+		     	  "FROM {multidatabase_metadata_content} ".
+				  "WHERE metadata_id = ? ";
+        } else { return array();
+        }
+		$x = $this->_db->execute($sql, $params);
+        //return array("x y z");
+        if ( ! $x  ) {return  array();};
+        return $x;
+    }
+
+    function getMultiByContentID($content_id) {
+		 $sql = "SELECT  metadata_id,content ".
+				"FROM {multidatabase_metadata_content} ".
+				"WHERE content_id = ? ";
+		 $params = array($content_id);
+		 $x = $this->_db->execute($sql, $params);
+         if ( ! $x  ) {return  array();};
+   
+          if ( isset($x[0]) ) {
+          $xx = array();
+          foreach ($x as $k=>$v) {
+            $xx[$v['metadata_id']] = $v['content'];
+          }
+         } else { return array();};
+          return $xx;
+    }  
     function getMultiByBlockID($multidatabase_id,$block_id) {
     // 指定された汎用DBが、項目名として、block_id を持っている場合に、
     // そのコンテンツを戻す
        $xxx = array();
-	   $metadata=$this->getMultiMeta($multidatabase_id); 
+	   $metadata=$this->getMultiMetaName($multidatabase_id); 
 
        if ( isset($metadata['block_id']) ){
 		$metadata_block_id=$metadata['block_id'];
@@ -202,8 +274,8 @@ class Patchworks_Components_View
 	 */
 
 
-	function getGroups() {
-    // group room一覧情報を取得
+	function getRoomList() {
+    // group room一覧情報を取得( room は、特別 page )
 		$params = array(2);
 		$sql = "SELECT room_id,page_name ".
 				"FROM {pages} ".
@@ -264,6 +336,7 @@ class Patchworks_Components_View
     }
 
     // sql を直接送ってデータ取得
+    // なんでもあり
     function getDataBySql($params,$sql) {
 		$x = $this->_db->execute($sql, $params);
 		if ($x === false) {
@@ -272,6 +345,63 @@ class Patchworks_Components_View
               }
 		return $x;
     }
+
+	function getOnlineMember(){
+	    $session = $this->_session;
+        
+        $onlineTime = 300;
+
+		$baseSessionID = $session->getParameter("_base_sess_id");
+		if (empty($baseSessionID)) {
+			$baseSessionID = session_id();
+		}
+
+		$date = date("YmdHis", time() - $onlineTime);
+		$params = array(
+			$date,
+			$baseSessionID,
+			_OFF
+		);
+		$sql = "SELECT base_sess_id, sess_data ".
+				"FROM {session} ".
+				"WHERE sess_updated > ? ".
+				"AND base_sess_id != ? ".
+				"AND old_flag = ?";
+
+		$result = $this->_db->execute($sql, $params);
+		if ($result === false) {
+			$this->_db->addError();
+			return "error";
+		}
+
+		$sessionIDs = array();
+		$member = 0;
+
+        $x=array();
+		foreach (array_keys($result) as $key) {
+			if (in_array($result[$key]["base_sess_id"], $sessionIDs)) {
+				continue;
+			}
+			
+			$sessionIDs[] = $result[$key]["base_sess_id"];
+			
+			if (preg_match('/;_user_id\|s:40:"([0-9a-zA-Z]+)";/', $result[$key]["sess_data"], $matches)) {
+				$member++;
+			}
+		}
+		$user = count($sessionIDs) + 1;
+
+		$userID = $session->getParameter("_user_id");
+		if (!empty($userID)) {
+			$member++;
+		}
+		
+		$userMember = array("xxx" =>$x,
+                           "user" => $user,
+						   "member" => $member);
+		
+		return $userMember;
+	}
 
 }
 
